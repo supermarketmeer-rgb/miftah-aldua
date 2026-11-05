@@ -30,13 +30,20 @@
                 <data android:scheme="miftah" />
             </intent-filter>
 
-            <!-- App Links for Web Domain: https://miftah-duas.app -->
+            <!-- App Links for Live GitHub Pages Domain: https://supermarketmeer-rgb.github.io/miftah-aldua -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="supermarketmeer-rgb.github.io" android:pathPrefix="/miftah-aldua" />
+            </intent-filter>
+
+            <!-- App Links for Custom Scheme & Legacy Domain -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="miftah-duas.app" />
-                <data android:scheme="http" android:host="miftah-duas.app" />
             </intent-filter>
 
         </activity>
