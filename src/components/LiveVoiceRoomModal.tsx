@@ -116,6 +116,20 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
+  const handleOpenWhatsApp = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (typeof window !== 'undefined') {
+      window.open(whatsappUrl, '_system') || (window.location.href = whatsappUrl);
+    }
+  };
+
+  const handleOpenTelegram = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (typeof window !== 'undefined') {
+      window.open(telegramUrl, '_system') || (window.location.href = telegramUrl);
+    }
+  };
+
   const handleToggleMute = () => {
     liveVoiceEngine.toggleMute();
   };
@@ -354,6 +368,7 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
           <div className="grid grid-cols-2 gap-2">
             <a
               href={whatsappUrl}
+              onClick={handleOpenWhatsApp}
               target="_blank"
               rel="noopener noreferrer"
               className="py-2 px-3 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-xs transition"
@@ -364,6 +379,7 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
 
             <a
               href={telegramUrl}
+              onClick={handleOpenTelegram}
               target="_blank"
               rel="noopener noreferrer"
               className="py-2 px-3 rounded-xl bg-[#229ED9] hover:bg-[#1e8ec4] text-white text-xs font-semibold flex items-center justify-center gap-1.5 shadow-xs transition"

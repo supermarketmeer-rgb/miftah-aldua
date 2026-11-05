@@ -363,16 +363,11 @@ export function getCleanDuaLink(duaOrId: string | Dua): string {
 /**
  * Creates Telegram Web and App share URL
  */
-export function generateTelegramShareUrl(url: string, text?: string): string {
-  if (!text) {
-    return `https://t.me/share/url?url=${encodeURIComponent(url)}`;
-  }
-  // When text already contains the URL, don't pass url param separately
-  // so Telegram doesn't duplicate the link or force separate preview unfurls
-  if (text.includes(url)) {
-    return `https://t.me/share/url?url=&text=${encodeURIComponent(text)}`;
-  }
-  return `https://t.me/share/url?url=&text=${encodeURIComponent(`${text}\n${url}`)}`;
+export function generateTelegramShareUrl(url: string, text: string = ''): string {
+  const cleanUrl = url.trim();
+  // Strip url from text if already present so Telegram doesn't show it twice
+  const cleanText = text.replace(cleanUrl, '').trim();
+  return `https://t.me/share/url?url=${encodeURIComponent(cleanUrl)}&text=${encodeURIComponent(cleanText)}`;
 }
 
 /**

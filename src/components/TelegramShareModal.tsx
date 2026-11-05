@@ -123,6 +123,20 @@ export const TelegramShareModal: React.FC<TelegramShareModalProps> = ({
   const whatsappInviteUrl = generateWhatsAppShareUrl(fullMessageText);
   const telegramInviteUrl = generateTelegramShareUrl(inviteLink, fullMessageText);
 
+  const handleOpenWhatsApp = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (typeof window !== 'undefined') {
+      window.open(whatsappShareUrl, '_system') || (window.location.href = whatsappShareUrl);
+    }
+  };
+
+  const handleOpenTelegram = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (typeof window !== 'undefined') {
+      window.open(telegramShareUrl, '_system') || (window.location.href = telegramShareUrl);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <div className="w-full max-w-lg rounded-3xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 shadow-2xl p-6 sm:p-8 text-right max-h-[90vh] overflow-y-auto">
@@ -190,6 +204,7 @@ export const TelegramShareModal: React.FC<TelegramShareModalProps> = ({
             <div className="space-y-2">
               <a
                 href={whatsappShareUrl}
+                onClick={handleOpenWhatsApp}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-3 px-4 rounded-2xl bg-[#25D366] hover:bg-[#20ba59] text-white font-semibold text-sm flex items-center justify-center gap-2.5 shadow-md transition active:scale-[0.98]"
@@ -200,6 +215,7 @@ export const TelegramShareModal: React.FC<TelegramShareModalProps> = ({
 
               <a
                 href={telegramShareUrl}
+                onClick={handleOpenTelegram}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-2.5 px-4 rounded-2xl bg-[#229ED9] hover:bg-[#1e8ec4] text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-sm transition active:scale-[0.98]"
