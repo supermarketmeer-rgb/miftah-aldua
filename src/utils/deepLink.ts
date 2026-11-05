@@ -363,8 +363,16 @@ export function getCleanDuaLink(duaOrId: string | Dua): string {
 /**
  * Creates Telegram Web and App share URL
  */
-export function generateTelegramShareUrl(url: string, text: string): string {
-  return `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+export function generateTelegramShareUrl(url: string, text?: string): string {
+  if (!text) {
+    return `https://t.me/share/url?url=${encodeURIComponent(url)}`;
+  }
+  // When text already contains the URL, don't pass url param separately
+  // so Telegram doesn't duplicate the link or force separate preview unfurls
+  if (text.includes(url)) {
+    return `https://t.me/share/url?url=&text=${encodeURIComponent(text)}`;
+  }
+  return `https://t.me/share/url?url=&text=${encodeURIComponent(`${text}\n${url}`)}`;
 }
 
 /**
@@ -383,78 +391,41 @@ export function generateLiveVoiceShareLink(duaOrId: string | Dua, roomId: string
 
 /**
  * Formats a Live Voice Recitation invitation message for WhatsApp and Telegram
- * Polished, spiritual invitation without Gmail or GitHub names
+ * Clean format: Title + Link only
  */
 export function formatLiveVoiceInvitation(dua: Dua, roomId: string, customShortUrl?: string): {
   link: string;
   shareMessage: string;
 } {
   const link = customShortUrl || generateLiveVoiceShareLink(dua, roomId);
-  const shareMessage = [
-    `🕊️ بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ`,
-    `🎙️ نَدْعُوكُمْ لِلاِشْتِرَاكِ مَعَنَا فِي قِرَاءَةِ «${dua.title}» صَوْتِيّاً وَمُبَاشَرَةً`,
-    dua.occasion ? `✨ المناسبة: ${dua.occasion}` : '',
-    dua.source ? `📚 المصدر: ${dua.source}` : '',
-    ``,
-    `📲 اضغط هنا للانضمام إلى القراءة الصوتية المباشرة فوراً:`,
-    link,
-    ``,
-    `📌 (يفتح الدعاء مباشرة أمامكم مع إمكانية القراءة بالصوت أو الاستماع)`,
-    `«تطبيق مفتاح الدعاء»`
-  ].filter(Boolean).join('\n');
-
+  const shareMessage = `${dua.title} (قراءة صوتية مباشرة)\n${link}`;
   return { link, shareMessage };
 }
 
 /**
- * Formats a prayer invitation / sharing text with the clean shortened link
+ * Formats a prayer sharing text with the clean shortened link
+ * Clean format: Name of Dua/Ziyarah + Link only
  */
 export function formatDuaShareMessage(dua: Dua, page: number = 1): {
   link: string;
   shareMessage: string;
 } {
   const link = getCleanDuaLink(dua);
-  const shareMessage = [
-    `🕊️ بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ`,
-    `📖 نَدْعُوكُمْ لِلاِشْتِرَاكِ مَعَنَا فِي قِرَاءَةِ «${dua.title}»`,
-    dua.occasion ? `✨ المناسبة: ${dua.occasion}` : '',
-    dua.source ? `📚 المصدر: ${dua.source}` : '',
-    ``,
-    `📲 رابط فتح واستماع الدعاء مباشرة:`,
-    link,
-    ``,
-    `«تطبيق مفتاح الدعاء - كتاب الأدعية والزيارات»`
-  ].filter(Boolean).join('\n');
-
+  const shareMessage = `${dua.title}\n${link}`;
   return { link, shareMessage };
 }
 
 /**
  * Formats a prayer invitation for Telegram & WhatsApp groups
+ * Clean format: Name of Dua/Ziyarah + Link only
  */
 export function formatTelegramGroupInvitation(
   dua: Dua,
   page: number = 1,
   groupNote?: string
 ): { shareUrl: string; fullMessageText: string; link: string } {
-  const { link, shareMessage } = formatDuaShareMessage(dua, page);
-
-  const lines = [
-    `🕊️ بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ`,
-    `📖 نَدْعُوكُمْ لِقِرَاءَةِ «${dua.title}» جَمَاعِيّاً`,
-    dua.occasion ? `✨ المُنَاسَبَة: ${dua.occasion}` : '',
-    dua.source ? `📚 المَصْدَر: ${dua.source}` : '',
-    groupNote ? `📌 مُلاحظة: ${groupNote}` : '',
-    ``,
-    `📲 افتح الدعاء واستمع للتلاوة الصوتية المتزامنة مباشرة عبر الرابط:`,
-    link,
-    ``,
-    `«تطبيق كتاب الأدعية الشيعية - مفتاح الدعاء»`
-  ].filter(Boolean);
-
-  const fullMessageText = lines.join('\n');
-  const shareUrl = generateTelegramShareUrl(link, `📖 قراءة مباركة: ${dua.title}\n${dua.occasion}`);
-
+  const { link, shareMessage: fullMessageText } = formatDuaShareMessage(dua, page);
+  const shareUrl = generateTelegramShareUrl(link, fullMessageText);
   return { shareUrl, fullMessageText, link };
 }
 

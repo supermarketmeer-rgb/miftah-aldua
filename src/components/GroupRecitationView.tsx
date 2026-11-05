@@ -98,19 +98,7 @@ export const GroupRecitationView: React.FC<GroupRecitationViewProps> = ({
   const handleShareToTelegram = (session: GroupRecitationSession) => {
     const matchedDua = allDuas.find(d => d.id === session.duaId);
     const link = getCleanDuaLink(matchedDua || session.duaId);
-
-    const message = [
-      `🕊️ بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ`,
-      `🕌 ${session.title}`,
-      `✨ المناسبة: ${session.occasion}`,
-      `👥 المشاركون حتى الآن: ${session.currentCount} من أصل ${session.targetCount}`,
-      session.notes ? `📌 ${session.notes}` : '',
-      ``,
-      `📲 دعوة للاشتراك بقراءة الدعاء عبر الرابط:`,
-      link,
-      ``,
-      `«تطبيق كتاب الأدعية الشيعية - مفتاح الدعاء»`
-    ].filter(Boolean).join('\n');
+    const message = `${session.title}\n${link}`;
 
     const telegramUrl = generateTelegramShareUrl(link, message);
     window.open(telegramUrl, '_blank');
@@ -119,16 +107,7 @@ export const GroupRecitationView: React.FC<GroupRecitationViewProps> = ({
   const handleCopyTelegramUpdate = (session: GroupRecitationSession) => {
     const matchedDua = allDuas.find(d => d.id === session.duaId);
     const link = getCleanDuaLink(matchedDua || session.duaId);
-    const message = [
-      `🕊️ بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ`,
-      `🕌 ${session.title}`,
-      `✨ المناسبة: ${session.occasion}`,
-      `👥 المشاركون حتى الآن: ${session.currentCount} من ${session.targetCount}`,
-      session.notes ? `📌 ${session.notes}` : '',
-      ``,
-      `📲 دعوة للاشتراك بقراءة الدعاء والاستماع للتلاوة الصوتية:`,
-      link
-    ].filter(Boolean).join('\n');
+    const message = `${session.title}\n${link}`;
 
     navigator.clipboard.writeText(message);
     setCopiedSessionId(session.id);

@@ -21,7 +21,7 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
   if (!isOpen || !verse || !dua) return null;
 
   const shortLink = getCleanDuaLink(dua);
-  const fullShareText = `«${verse.textAr}»\n\n— من: ${dua.title}\n— المصدر: ${dua.source}\n\n📲 دعوة للاشتراك بقراءة الدعاء عبر الرابط:\n${shortLink}\n\n— تطبيق مفتاح الدعاء`;
+  const fullShareText = `«${verse.textAr}»\n\n${dua.title}\n${shortLink}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(fullShareText);

@@ -108,7 +108,7 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
     shortRoomLink || undefined
   );
   const whatsappUrl = generateWhatsAppShareUrl(shareMessage);
-  const telegramUrl = generateTelegramShareUrl(shareLink, `🎙️ دعوة للاشتراك بقراءة «${dua.title}» مباشرة`);
+  const telegramUrl = generateTelegramShareUrl(shareLink, shareMessage);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);

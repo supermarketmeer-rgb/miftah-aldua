@@ -54,10 +54,7 @@ export const TelegramShareModal: React.FC<TelegramShareModalProps> = ({
   const { shareMessage } = formatDuaShareMessage(dua, currentPage);
 
   // Sharing URLs
-  const telegramShareUrl = generateTelegramShareUrl(
-    deepLink,
-    `📖 دعوة للاشتراك بقراءة: «${dua.title}»\n${dua.occasion ? `✨ ${dua.occasion}\n` : ''}${dua.source ? `📚 ${dua.source}\n` : ''}`
-  );
+  const telegramShareUrl = generateTelegramShareUrl(deepLink, shareMessage);
   const whatsappShareUrl = generateWhatsAppShareUrl(shareMessage);
 
   // Audio track URL
@@ -100,7 +97,7 @@ export const TelegramShareModal: React.FC<TelegramShareModalProps> = ({
   const handleCopyFullText = () => {
     const formattedHeader = `بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ\n✤ ${dua.title} ✤\n[${dua.source}]\n\n`;
     const fullBody = dua.verses.map(v => v.textAr).join('\n\n');
-    const footer = `\n\n📲 رابط فتح واستماع الدعاء:\n${deepLink}\n\n— تمت المشاركة عبر تطبيق «مفتاح الدعاء»`;
+    const footer = `\n\n${dua.title}\n${deepLink}`;
 
     navigator.clipboard.writeText(formattedHeader + fullBody + footer);
     setCopiedFullText(true);
