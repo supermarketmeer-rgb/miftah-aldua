@@ -1,0 +1,56 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer utilities {
+  .font-amiri {
+    font-family: 'Amiri', serif;
+  }
+  .font-scheherazade {
+    font-family: 'Scheherazade New', serif;
+  }
+  .font-naskh {
+    font-family: 'Noto Naskh Arabic', serif;
+  }
+  .font-cairo {
+    font-family: 'Cairo', sans-serif;
+  }
+}
+
+/* Custom smooth scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.4);
+}
+
+/* Book page paper texture & Islamic border styles */
+.islamic-frame {
+  border: 1px solid rgba(180, 83, 9, 0.2);
+  outline: 1px solid rgba(180, 83, 9, 0.1);
+  outline-offset: -5px;
+}
+
+.theme-sepia {
+  background-color: #f5eedc !important;
+  color: #3d2d1d !important;
+}
+
+.theme-sepia .reading-card {
+  background-color: #eee4ce !important;
+  border-color: #dfd2bc !important;
+  color: #2b1f13 !important;
+}
+
+/* Safe area insets for mobile */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 16px);
+}

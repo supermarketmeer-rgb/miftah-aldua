@@ -1,0 +1,6 @@
+{
+  "name": "مفتاح الدعاء - كتاب الأدعية الشيعية",
+  "description": "كتاب إلكتروني متكامل للأدعية والزيارات الشيعية مع الاستماع الصوتي والمزامنة الدقيقة والعمل دون اتصال والسبحة الإلكترونية.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
