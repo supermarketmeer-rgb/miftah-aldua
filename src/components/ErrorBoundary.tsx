@@ -32,6 +32,22 @@ export class ErrorBoundary extends Component<Props, State> {
     }
   };
 
+  private handleClearCacheAndReload = () => {
+    try {
+      if ('caches' in window) {
+        caches.keys().then((names) => {
+          names.forEach((name) => caches.delete(name));
+        });
+      }
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+          registrations.forEach((r) => r.unregister());
+        });
+      }
+    } catch {}
+    window.location.reload();
+  };
+
   public render() {
     if (this.state.hasError) {
       return (
@@ -43,13 +59,21 @@ export class ErrorBoundary extends Component<Props, State> {
           <p className="text-xs text-stone-600 dark:text-stone-300 mb-3 leading-relaxed">
             {this.state.error?.message || 'تعذر إتمام الإجراء المطلوب، يرجى التحقق من أذونات الهاتف وإعادة المحاولة.'}
           </p>
-          <button
-            onClick={this.handleReset}
-            className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center gap-1.5 transition active:scale-95"
-          >
-            <RefreshCw className="w-3.5 h-3.5" />
-            <span>إعادة المحاولة</span>
-          </button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={this.handleReset}
+              className="px-3.5 py-1.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold flex items-center gap-1.5 transition active:scale-95"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>إعادة المحاولة</span>
+            </button>
+            <button
+              onClick={this.handleClearCacheAndReload}
+              className="px-3 py-1.5 rounded-xl bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300 text-xs font-semibold hover:bg-stone-300 dark:hover:bg-stone-700 transition"
+            >
+              تحديث الصفحة ومسح الذاكرة المؤقتة
+            </button>
+          </div>
         </div>
       );
     }

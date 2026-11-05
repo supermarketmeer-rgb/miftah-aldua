@@ -91,7 +91,16 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
     if (!activeRoomId) return;
 
     let isMounted = true;
-    const longLink = generateLiveVoiceShareLink(dua, activeRoomId);
+    let longLink = '';
+    try {
+      if (typeof generateLiveVoiceShareLink === 'function') {
+        longLink = generateLiveVoiceShareLink(dua, activeRoomId);
+      } else {
+        longLink = `https://supermarketmeer-rgb.github.io/miftah-aldua?dua=${encodeURIComponent(dua.id)}&room=${encodeURIComponent(activeRoomId)}`;
+      }
+    } catch {
+      longLink = `https://supermarketmeer-rgb.github.io/miftah-aldua?dua=${encodeURIComponent(dua.id)}&room=${encodeURIComponent(activeRoomId)}`;
+    }
 
     fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(longLink)}`)
       .then(res => res.text())
