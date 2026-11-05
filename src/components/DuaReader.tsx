@@ -82,6 +82,7 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
   const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
   const [showTelegramShareModal, setShowTelegramShareModal] = useState<boolean>(false);
   const [showLiveVoiceModal, setShowLiveVoiceModal] = useState<boolean>(!!initialRoomId);
+  const [expandVoiceModalTrigger, setExpandVoiceModalTrigger] = useState<number>(0);
   const [copiedVerseId, setCopiedVerseId] = useState<number | null>(null);
   const [bookmarkedIds, setBookmarkedIds] = useState<number[]>([]);
 
@@ -341,7 +342,10 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
           <div className="flex items-center gap-1 sm:gap-2">
             {/* Live Voice Recitation Button */}
             <button
-              onClick={() => setShowLiveVoiceModal(true)}
+              onClick={() => {
+                setShowLiveVoiceModal(true);
+                setExpandVoiceModalTrigger((t) => t + 1);
+              }}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-800 dark:text-amber-300 border border-amber-500/30 text-xs font-semibold transition active:scale-[0.98]"
               title="بدء قراءة صوتية مباشرة مع شخص آخر (مكالمة)"
             >
@@ -833,6 +837,7 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
       <ErrorBoundary fallbackTitle="تنبيه القراءة الصوتية المشتركة">
         <LiveVoiceRoomModal
           isOpen={showLiveVoiceModal}
+          expandTrigger={expandVoiceModalTrigger}
           onClose={() => setShowLiveVoiceModal(false)}
           dua={dua}
           initialRoomId={initialRoomId}

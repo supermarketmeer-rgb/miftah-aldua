@@ -14,7 +14,8 @@ import {
   Sparkles,
   MessageCircle,
   Send,
-  AlertCircle
+  AlertCircle,
+  X
 } from 'lucide-react';
 import { Dua } from '../types';
 import {
@@ -32,6 +33,7 @@ interface LiveVoiceRoomModalProps {
   initialRoomId?: string;
   isJoiningDirectly?: boolean;
   isOpen: boolean;
+  expandTrigger?: number;
   onClose: () => void;
 }
 
@@ -40,6 +42,7 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
   initialRoomId,
   isJoiningDirectly = false,
   isOpen,
+  expandTrigger = 0,
   onClose,
 }) => {
   const [voiceState, setVoiceState] = useState<LiveVoiceState>({
@@ -55,7 +58,7 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
     remoteConnected: false,
   });
 
-  const [isMinimized, setIsMinimized] = useState<boolean>(Boolean(initialRoomId || isJoiningDirectly));
+  const [isMinimized, setIsMinimized] = useState<boolean>(false);
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [shortRoomLink, setShortRoomLink] = useState<string>('');
 
@@ -66,17 +69,20 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
     return () => unsubscribe();
   }, []);
 
-  // Initialize room on open if not already active
+  // When user clicks the top bar mic button or opens modal, expand it and initialize if needed
   useEffect(() => {
-    if (isOpen && voiceState.status === 'idle') {
-      if (initialRoomId) {
-        liveVoiceEngine.joinRoom(initialRoomId).catch(() => {});
-      } else {
-        const roomSlug = dua.id.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8);
-        liveVoiceEngine.startRoom(`miftah-${roomSlug}-${Math.random().toString(36).substring(2, 7)}`).catch(() => {});
+    if (isOpen) {
+      setIsMinimized(false);
+      if (voiceState.status === 'idle' || voiceState.status === 'error') {
+        if (initialRoomId) {
+          liveVoiceEngine.joinRoom(initialRoomId).catch(() => {});
+        } else {
+          const roomSlug = dua.id.replace(/[^a-zA-Z0-9]/g, '').slice(0, 8);
+          liveVoiceEngine.startRoom(`miftah-${roomSlug}-${Math.random().toString(36).substring(2, 7)}`).catch(() => {});
+        }
       }
     }
-  }, [isOpen, initialRoomId, dua.id]);
+  }, [isOpen, expandTrigger]);
 
   // Generate dynamic clean short link (via is.gd) without exposing github/gmail
   useEffect(() => {
@@ -144,7 +150,7 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
   // -------------------------------------------------------------
   if (isMinimized) {
     return (
-      <div className="fixed bottom-20 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-50 animate-in fade-in slide-in-from-bottom-4">
+      <div className="fixed bottom-24 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-[60] animate-in fade-in slide-in-from-bottom-4">
         <div className="rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-stone-900 text-white p-3.5 shadow-2xl border-2 border-emerald-500/40 backdrop-blur-xl flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 overflow-hidden">
             {/* Live Pulsing Dot */}
@@ -215,7 +221,7 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
   // FULL MODAL VIEW
   // -------------------------------------------------------------
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md p-4">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/75 backdrop-blur-md p-4">
       <div className="w-full max-w-md rounded-3xl bg-white dark:bg-slate-900 border border-stone-200 dark:border-slate-800 shadow-2xl p-6 sm:p-7 text-right max-h-[92vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between pb-3 border-b border-stone-100 dark:border-slate-800 mb-5">
@@ -233,13 +239,20 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => setIsMinimized(true)}
               className="p-1.5 rounded-xl text-stone-400 hover:text-stone-600 dark:hover:text-stone-200 hover:bg-stone-100 dark:hover:bg-slate-800 transition"
               title="تصغير اللوحة ومتابعة قراءة الدعاء"
             >
               <Minimize2 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={onClose}
+              className="p-1.5 rounded-xl text-stone-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-stone-100 dark:hover:bg-slate-800 transition"
+              title="إغلاق النافذة"
+            >
+              <X className="w-4 h-4" />
             </button>
           </div>
         </div>
