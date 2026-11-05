@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { Dua } from '../types';
 import {
-  generateDuaDeepLink,
+  getCleanDuaLink,
   generateTelegramShareUrl,
   generateWhatsAppShareUrl,
   formatTelegramGroupInvitation,
@@ -49,14 +49,14 @@ export const TelegramShareModal: React.FC<TelegramShareModalProps> = ({
 
   if (!isOpen) return null;
 
-  // Shortened link with the friendly Arabic name of the Dua
-  const deepLink = generateDuaDeepLink(dua, currentPage, currentReciterId);
+  // Shortened permanent link without Gmail or GitHub names
+  const deepLink = getCleanDuaLink(dua);
   const { shareMessage } = formatDuaShareMessage(dua, currentPage);
 
   // Sharing URLs
   const telegramShareUrl = generateTelegramShareUrl(
     deepLink,
-    `📖 قراءة مباركة: ${dua.title}\n${dua.occasion ? `✨ ${dua.occasion}\n` : ''}${dua.source ? `📚 ${dua.source}\n` : ''}`
+    `📖 دعوة للاشتراك بقراءة: «${dua.title}»\n${dua.occasion ? `✨ ${dua.occasion}\n` : ''}${dua.source ? `📚 ${dua.source}\n` : ''}`
   );
   const whatsappShareUrl = generateWhatsAppShareUrl(shareMessage);
 

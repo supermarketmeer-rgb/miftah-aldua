@@ -55,8 +55,9 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
     remoteConnected: false,
   });
 
-  const [isMinimized, setIsMinimized] = useState<boolean>(false);
+  const [isMinimized, setIsMinimized] = useState<boolean>(Boolean(initialRoomId || isJoiningDirectly));
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
+  const [shortRoomLink, setShortRoomLink] = useState<string>('');
 
   useEffect(() => {
     const unsubscribe = liveVoiceEngine.subscribe((state) => {
@@ -77,11 +78,37 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
     }
   }, [isOpen, initialRoomId, dua.id]);
 
+  // Generate dynamic clean short link (via is.gd) without exposing github/gmail
+  useEffect(() => {
+    const activeRoomId = voiceState.roomId || initialRoomId;
+    if (!activeRoomId) return;
+
+    let isMounted = true;
+    const longLink = generateLiveVoiceShareLink(dua, activeRoomId);
+
+    fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(longLink)}`)
+      .then(res => res.text())
+      .then(text => {
+        if (isMounted && text && text.startsWith('https://is.gd/')) {
+          setShortRoomLink(text.trim());
+        }
+      })
+      .catch(() => {});
+
+    return () => {
+      isMounted = false;
+    };
+  }, [dua, voiceState.roomId, initialRoomId]);
+
   if (!isOpen) return null;
 
-  const { link: shareLink, shareMessage } = formatLiveVoiceInvitation(dua, voiceState.roomId || initialRoomId || '');
+  const { link: shareLink, shareMessage } = formatLiveVoiceInvitation(
+    dua,
+    voiceState.roomId || initialRoomId || '',
+    shortRoomLink || undefined
+  );
   const whatsappUrl = generateWhatsAppShareUrl(shareMessage);
-  const telegramUrl = generateTelegramShareUrl(shareLink, `🎙️ دعوة لقراءة صوتية مباشرة: «${dua.title}»`);
+  const telegramUrl = generateTelegramShareUrl(shareLink, `🎙️ دعوة للاشتراك بقراءة «${dua.title}» مباشرة`);
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(shareLink);
@@ -359,3 +386,4 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
     </div>
   );
 };
+

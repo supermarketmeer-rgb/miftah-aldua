@@ -24,15 +24,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [clearingCache, setClearingCache] = useState<boolean>(false);
   const [shareDomain, setShareDomain] = useState<string>(() => {
     if (typeof window !== 'undefined') {
-      return localStorage.getItem('miftah_custom_share_domain') || 'https://supermarketmeer-rgb.github.io/miftah-aldua';
+      return localStorage.getItem('miftah_custom_share_domain') || 'https://is.gd';
     }
-    return 'https://supermarketmeer-rgb.github.io/miftah-aldua';
+    return 'https://is.gd';
   });
 
   const handleSaveShareDomain = (val: string) => {
     setShareDomain(val);
     if (typeof window !== 'undefined') {
-      if (val.trim() && val.trim() !== 'https://supermarketmeer-rgb.github.io/miftah-aldua') {
+      if (val.trim() && val.trim() !== 'https://is.gd') {
         localStorage.setItem('miftah_custom_share_domain', val.trim());
       } else {
         localStorage.removeItem('miftah_custom_share_domain');
@@ -165,7 +165,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                 type="url"
                 value={shareDomain}
                 onChange={(e) => handleSaveShareDomain(e.target.value)}
-                placeholder="https://supermarketmeer-rgb.github.io/miftah-aldua"
+                placeholder="https://is.gd"
                 className="w-full text-xs font-mono p-2.5 rounded-xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-stone-800 dark:text-stone-200 focus:outline-none focus:ring-1 focus:ring-emerald-500 text-left"
                 dir="ltr"
               />

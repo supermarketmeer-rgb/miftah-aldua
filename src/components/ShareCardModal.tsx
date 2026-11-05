@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { X, Copy, Check, Share2, MessageCircle, Send } from 'lucide-react';
 import { Verse, Dua } from '../types';
-import { generateDuaDeepLink, generateWhatsAppShareUrl, generateTelegramShareUrl } from '../utils/deepLink';
+import { getCleanDuaLink, generateWhatsAppShareUrl, generateTelegramShareUrl } from '../utils/deepLink';
 
 interface ShareCardModalProps {
   isOpen: boolean;
@@ -20,8 +20,8 @@ export const ShareCardModal: React.FC<ShareCardModalProps> = ({
 
   if (!isOpen || !verse || !dua) return null;
 
-  const shortLink = generateDuaDeepLink(dua);
-  const fullShareText = `«${verse.textAr}»\n\n— من: ${dua.title}\n— المصدر: ${dua.source}\n\n📲 رابط فتح الدعاء والاستماع مباشرة:\n${shortLink}\n\n— تطبيق مفتاح الدعاء`;
+  const shortLink = getCleanDuaLink(dua);
+  const fullShareText = `«${verse.textAr}»\n\n— من: ${dua.title}\n— المصدر: ${dua.source}\n\n📲 دعوة للاشتراك بقراءة الدعاء عبر الرابط:\n${shortLink}\n\n— تطبيق مفتاح الدعاء`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(fullShareText);

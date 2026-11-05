@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Users, Send, CheckCircle2, Plus, Sparkles, BookOpen, Share2, Award, ArrowLeft } from 'lucide-react';
 import { Dua } from '../types';
-import { generateDuaDeepLink, generateTelegramShareUrl } from '../utils/deepLink';
+import { getCleanDuaLink, generateTelegramShareUrl } from '../utils/deepLink';
 import confetti from 'canvas-confetti';
 
 interface GroupRecitationSession {
@@ -97,7 +97,7 @@ export const GroupRecitationView: React.FC<GroupRecitationViewProps> = ({
 
   const handleShareToTelegram = (session: GroupRecitationSession) => {
     const matchedDua = allDuas.find(d => d.id === session.duaId);
-    const link = generateDuaDeepLink(matchedDua || session.duaId, 1);
+    const link = getCleanDuaLink(matchedDua || session.duaId);
 
     const message = [
       `🕊️ بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ`,
@@ -106,7 +106,7 @@ export const GroupRecitationView: React.FC<GroupRecitationViewProps> = ({
       `👥 المشاركون حتى الآن: ${session.currentCount} من أصل ${session.targetCount}`,
       session.notes ? `📌 ${session.notes}` : '',
       ``,
-      `📲 شارك معنا واقرأ الدعاء مباشرة عبر الرابط:`,
+      `📲 دعوة للاشتراك بقراءة الدعاء عبر الرابط:`,
       link,
       ``,
       `«تطبيق كتاب الأدعية الشيعية - مفتاح الدعاء»`
@@ -118,7 +118,7 @@ export const GroupRecitationView: React.FC<GroupRecitationViewProps> = ({
 
   const handleCopyTelegramUpdate = (session: GroupRecitationSession) => {
     const matchedDua = allDuas.find(d => d.id === session.duaId);
-    const link = generateDuaDeepLink(matchedDua || session.duaId, 1);
+    const link = getCleanDuaLink(matchedDua || session.duaId);
     const message = [
       `🕊️ بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ`,
       `🕌 ${session.title}`,
@@ -126,7 +126,7 @@ export const GroupRecitationView: React.FC<GroupRecitationViewProps> = ({
       `👥 المشاركون حتى الآن: ${session.currentCount} من ${session.targetCount}`,
       session.notes ? `📌 ${session.notes}` : '',
       ``,
-      `📲 افتح الدعاء واستمع للتلاوة الصوتية:`,
+      `📲 دعوة للاشتراك بقراءة الدعاء والاستماع للتلاوة الصوتية:`,
       link
     ].filter(Boolean).join('\n');
 

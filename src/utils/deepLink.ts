@@ -307,6 +307,60 @@ export function generateWhatsAppShareUrl(text: string): string {
 }
 
 /**
+ * Clean, short, permanent URLs without any Gmail username or GitHub name
+ */
+export const DUA_CLEAN_SHORT_LINKS: Record<string, string> = {
+  'dua-kumayl': 'https://is.gd/miftah_kumayl',
+  'kumayl': 'https://is.gd/miftah_kumayl',
+  'dua-tawassul': 'https://is.gd/miftah_tawassul',
+  'tawassul': 'https://is.gd/miftah_tawassul',
+  'ziyarat-ashura': 'https://is.gd/miftah_ashura',
+  'ashura': 'https://is.gd/miftah_ashura',
+  'dua-nudba': 'https://is.gd/miftah_nudba',
+  'nudba': 'https://is.gd/miftah_nudba',
+  'nudbah': 'https://is.gd/miftah_nudba',
+  'dua-simat': 'https://is.gd/miftah_simat',
+  'samaat': 'https://is.gd/miftah_simat',
+  'dua-iftitah': 'https://is.gd/miftah_iftitah',
+  'iftitah': 'https://is.gd/miftah_iftitah',
+  'dua-sahar': 'https://is.gd/miftah_sahar',
+  'sehar': 'https://is.gd/miftah_sahar',
+  'dua-rajab': 'https://is.gd/miftah_rajab',
+  'munajat-shabaniyah': 'https://is.gd/miftah_shaban',
+  'dua-arafah': 'https://is.gd/miftah_arafah',
+  'dua-ahd': 'https://is.gd/miftah_ahd',
+  'ahad': 'https://is.gd/miftah_ahd',
+  'dua-faraj': 'https://is.gd/miftah_faraj',
+  'faraj': 'https://is.gd/miftah_faraj',
+  'dua-sabah': 'https://is.gd/miftah_sabah',
+  'sabah': 'https://is.gd/miftah_sabah',
+  'dua-mujir': 'https://is.gd/miftah_mujir',
+  'mujeer': 'https://is.gd/miftah_mujir',
+  'ziyarat-al-yasin': 'https://is.gd/miftah_alyasin',
+  'alyasin': 'https://is.gd/miftah_alyasin',
+  'hadith-kisa': 'https://is.gd/miftah_kisa',
+  'kisaa': 'https://is.gd/miftah_kisa',
+  'dua-saturday': 'https://is.gd/miftah_sabt',
+  'dua-sunday': 'https://is.gd/miftah_ahad_day',
+  'dua-monday': 'https://is.gd/miftah_ithnayn',
+  'dua-tuesday': 'https://is.gd/miftah_thulatha',
+  'dua-wednesday': 'https://is.gd/miftah_arbaa',
+  'dua-thursday': 'https://is.gd/miftah_khamis',
+  'dua-friday': 'https://is.gd/miftah_jumua',
+};
+
+/**
+ * Gets clean short link free from Gmail handle and GitHub domain
+ */
+export function getCleanDuaLink(duaOrId: string | Dua): string {
+  const id = typeof duaOrId === 'string' ? duaOrId : duaOrId.id;
+  if (DUA_CLEAN_SHORT_LINKS[id]) {
+    return DUA_CLEAN_SHORT_LINKS[id];
+  }
+  return generateDuaDeepLink(duaOrId, 1);
+}
+
+/**
  * Creates Telegram Web and App share URL
  */
 export function generateTelegramShareUrl(url: string, text: string): string {
@@ -329,41 +383,47 @@ export function generateLiveVoiceShareLink(duaOrId: string | Dua, roomId: string
 
 /**
  * Formats a Live Voice Recitation invitation message for WhatsApp and Telegram
+ * Polished, spiritual invitation without Gmail or GitHub names
  */
-export function formatLiveVoiceInvitation(dua: Dua, roomId: string): {
+export function formatLiveVoiceInvitation(dua: Dua, roomId: string, customShortUrl?: string): {
   link: string;
   shareMessage: string;
 } {
-  const link = generateLiveVoiceShareLink(dua, roomId);
+  const link = customShortUrl || generateLiveVoiceShareLink(dua, roomId);
   const shareMessage = [
     `🕊️ بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ`,
-    `🎙️ دعوة لقراءة صوتية مشتركة مباشرة: «${dua.title}»`,
-    `✨ انضم إليّ الآن عبر المكالمة الصوتية المباشرة للقراءة والاستماع معاً في نفس الوقت:`,
+    `🎙️ نَدْعُوكُمْ لِلاِشْتِرَاكِ مَعَنَا فِي قِرَاءَةِ «${dua.title}» صَوْتِيّاً وَمُبَاشَرَةً`,
+    dua.occasion ? `✨ المناسبة: ${dua.occasion}` : '',
+    dua.source ? `📚 المصدر: ${dua.source}` : '',
+    ``,
+    `📲 اضغط هنا للانضمام إلى القراءة الصوتية المباشرة فوراً:`,
     link,
     ``,
-    `📌 (يمكنك القراءة بصوتك أو الاستماع، وتقليب صفحات الدعاء معاً)`
-  ].join('\n');
+    `📌 (يفتح الدعاء مباشرة أمامكم مع إمكانية القراءة بالصوت أو الاستماع)`,
+    `«تطبيق مفتاح الدعاء»`
+  ].filter(Boolean).join('\n');
 
   return { link, shareMessage };
 }
 
 /**
- * Formats a prayer invitation / sharing text with the clickable shortened link
+ * Formats a prayer invitation / sharing text with the clean shortened link
  */
 export function formatDuaShareMessage(dua: Dua, page: number = 1): {
   link: string;
   shareMessage: string;
 } {
-  const link = generateDuaDeepLink(dua, page);
+  const link = getCleanDuaLink(dua);
   const shareMessage = [
-    `📖 «${dua.title}»`,
+    `🕊️ بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ`,
+    `📖 نَدْعُوكُمْ لِلاِشْتِرَاكِ مَعَنَا فِي قِرَاءَةِ «${dua.title}»`,
     dua.occasion ? `✨ المناسبة: ${dua.occasion}` : '',
     dua.source ? `📚 المصدر: ${dua.source}` : '',
     ``,
-    `📲 افتح الدعاء واستمع للتلاوة الصوتية المتزامنة مباشرة عبر الرابط:`,
+    `📲 رابط فتح واستماع الدعاء مباشرة:`,
     link,
     ``,
-    `«تطبيق مفتاح الدعاء - كتاب الأدعية الشيعية»`
+    `«تطبيق مفتاح الدعاء - كتاب الأدعية والزيارات»`
   ].filter(Boolean).join('\n');
 
   return { link, shareMessage };
