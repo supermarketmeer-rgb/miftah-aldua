@@ -13,7 +13,6 @@ import { SettingsModal } from './components/SettingsModal';
 import { AddDuaModal } from './components/AddDuaModal';
 import { ShareCardModal } from './components/ShareCardModal';
 import { TelegramShareModal } from './components/TelegramShareModal';
-import { UpcomingDuaAlert } from './components/UpcomingDuaAlert';
 import { Dua, Verse, ReadingSettings, HijriDateInfo } from './types';
 import { INITIAL_DUAS } from './data/duas';
 import { getHijriDate } from './utils/hijriCalendar';
@@ -193,15 +192,6 @@ export default function App() {
         <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-24 md:pb-12">
           {currentTab === 'home' && (
             <>
-              {/* Upcoming / Recommended Dua Alert Card */}
-              <UpcomingDuaAlert
-                allDuas={allDuas}
-                hijriInfo={hijriInfo}
-                onPlayDua={(dua) => handleSelectDua(dua, 1, true)}
-                onReadDua={(dua) => handleSelectDua(dua, 1, false)}
-                onShareDua={(dua) => setTelegramShareDua(dua)}
-              />
-
               <HeroBanner
                 hijriInfo={hijriInfo}
                 todayDua={todayDua}
