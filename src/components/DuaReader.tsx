@@ -23,17 +23,20 @@ import {
   Sparkles,
   Repeat,
   Repeat1,
-  Send
+  Send,
+  Radio
 } from 'lucide-react';
 import { Dua, Verse, ReadingSettings, Reciter } from '../types';
 import { RECITERS } from '../data/reciters';
 import { audioEngine, AudioRepeatMode } from '../utils/audioEngine';
 import { saveReadingProgress, saveBookmark, getBookmarks, removeBookmark } from '../utils/storage';
 import { TelegramShareModal } from './TelegramShareModal';
+import { LiveVoiceRoomModal } from './LiveVoiceRoomModal';
 
 interface DuaReaderProps {
   dua: Dua;
   initialPage?: number;
+  initialRoomId?: string;
   autoPlay?: boolean;
   settings: ReadingSettings;
   onUpdateSettings: (settings: ReadingSettings) => void;
@@ -46,6 +49,7 @@ interface DuaReaderProps {
 export const DuaReader: React.FC<DuaReaderProps> = ({
   dua,
   initialPage = 1,
+  initialRoomId,
   autoPlay = false,
   settings,
   onUpdateSettings,
@@ -76,6 +80,7 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
   const [showSettingsDrawer, setShowSettingsDrawer] = useState<boolean>(false);
   const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
   const [showTelegramShareModal, setShowTelegramShareModal] = useState<boolean>(false);
+  const [showLiveVoiceModal, setShowLiveVoiceModal] = useState<boolean>(!!initialRoomId);
   const [copiedVerseId, setCopiedVerseId] = useState<number | null>(null);
   const [bookmarkedIds, setBookmarkedIds] = useState<number[]>([]);
 
@@ -333,6 +338,17 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
           </div>
 
           <div className="flex items-center gap-1 sm:gap-2">
+            {/* Live Voice Recitation Button */}
+            <button
+              onClick={() => setShowLiveVoiceModal(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-800 dark:text-amber-300 border border-amber-500/30 text-xs font-semibold transition active:scale-[0.98]"
+              title="بدء قراءة صوتية مباشرة مع شخص آخر (مكالمة)"
+            >
+              <Radio className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+              <span className="hidden sm:inline">قراءة صوتية مباشرة</span>
+              <span className="sm:hidden">مباشر 🎙️</span>
+            </button>
+
             <button
               onClick={() => setShowTelegramShareModal(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600/15 hover:bg-emerald-600/25 text-emerald-800 dark:text-emerald-300 text-xs font-semibold transition"
@@ -810,6 +826,14 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
         dua={dua}
         currentPage={currentPage}
         currentReciterId={selectedReciterId}
+      />
+
+      {/* Live Voice Interactive Recitation Modal / Floating Bar */}
+      <LiveVoiceRoomModal
+        isOpen={showLiveVoiceModal}
+        onClose={() => setShowLiveVoiceModal(false)}
+        dua={dua}
+        initialRoomId={initialRoomId}
       />
     </div>
   );

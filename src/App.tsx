@@ -34,6 +34,7 @@ export default function App() {
   const [activeDua, setActiveDua] = useState<Dua | null>(null);
   const [activePage, setActivePage] = useState<number>(1);
   const [autoPlay, setAutoPlay] = useState<boolean>(false);
+  const [activeRoomId, setActiveRoomId] = useState<string | undefined>(undefined);
 
   // Persistence States
   const [favorites, setFavorites] = useState<string[]>(getFavorites());
@@ -84,6 +85,9 @@ export default function App() {
   // Handle incoming deep link or universal link (WhatsApp / Telegram / App Link)
   useEffect(() => {
     const params = parseCurrentDeepLink();
+    if (params?.roomId) {
+      setActiveRoomId(params.roomId);
+    }
     if (params?.duaId) {
       const target = findDuaMatch(allDuas, params.duaId);
       if (target) {
@@ -133,6 +137,7 @@ export default function App() {
   const handleBackFromReader = () => {
     setActiveDua(null);
     setAutoPlay(false);
+    setActiveRoomId(undefined);
     if (typeof window !== 'undefined' && window.history) {
       try {
         const url = new URL(window.location.href);
@@ -140,6 +145,8 @@ export default function App() {
         url.searchParams.delete('d');
         url.searchParams.delete('p');
         url.searchParams.delete('page');
+        url.searchParams.delete('room');
+        url.searchParams.delete('voice');
         window.history.replaceState({}, '', url.toString());
       } catch {
         // Fallback
@@ -173,6 +180,7 @@ export default function App() {
         <DuaReader
           dua={activeDua}
           initialPage={activePage}
+          initialRoomId={activeRoomId}
           autoPlay={autoPlay}
           settings={settings}
           onUpdateSettings={handleUpdateSettings}

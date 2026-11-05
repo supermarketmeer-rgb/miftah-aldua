@@ -6,6 +6,7 @@ export interface DeepLinkParams {
   verseId?: number;
   reciterId?: string;
   groupId?: string;
+  roomId?: string;
 }
 
 /**
@@ -276,14 +277,22 @@ export function parseCurrentDeepLink(): DeepLinkParams | null {
       hashParams.get('group') ||
       undefined;
 
-    if (!duaQuery && !groupId) return null;
+    const roomId =
+      searchParams.get('room') ||
+      searchParams.get('voice') ||
+      hashParams.get('room') ||
+      hashParams.get('voice') ||
+      undefined;
+
+    if (!duaQuery && !groupId && !roomId) return null;
 
     return {
       duaId: duaQuery ? decodeURIComponent(duaQuery) : undefined,
       page: pageStr ? parseInt(pageStr, 10) : 1,
       verseId: verseStr ? parseInt(verseStr, 10) : undefined,
       reciterId,
-      groupId
+      groupId,
+      roomId
     };
   } catch {
     return null;
@@ -302,6 +311,40 @@ export function generateWhatsAppShareUrl(text: string): string {
  */
 export function generateTelegramShareUrl(url: string, text: string): string {
   return `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+}
+
+/**
+ * Generates a Live Voice Recitation invitation link with room ID
+ */
+export function generateLiveVoiceShareLink(duaOrId: string | Dua, roomId: string): string {
+  const baseLink = generateDuaDeepLink(duaOrId, 1);
+  try {
+    const url = new URL(baseLink);
+    url.searchParams.set('room', roomId);
+    return url.toString();
+  } catch {
+    return `${baseLink}&room=${roomId}`;
+  }
+}
+
+/**
+ * Formats a Live Voice Recitation invitation message for WhatsApp and Telegram
+ */
+export function formatLiveVoiceInvitation(dua: Dua, roomId: string): {
+  link: string;
+  shareMessage: string;
+} {
+  const link = generateLiveVoiceShareLink(dua, roomId);
+  const shareMessage = [
+    `🕊️ بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ`,
+    `🎙️ دعوة لقراءة صوتية مشتركة مباشرة: «${dua.title}»`,
+    `✨ انضم إليّ الآن عبر المكالمة الصوتية المباشرة للقراءة والاستماع معاً في نفس الوقت:`,
+    link,
+    ``,
+    `📌 (يمكنك القراءة بصوتك أو الاستماع، وتقليب صفحات الدعاء معاً)`
+  ].join('\n');
+
+  return { link, shareMessage };
 }
 
 /**
