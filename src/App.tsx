@@ -4,6 +4,7 @@ import { BottomTabBar } from './components/BottomTabBar';
 import { HeroBanner } from './components/HeroBanner';
 import { DuaList } from './components/DuaList';
 import { DuaReader } from './components/DuaReader';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { TasbeehCounter } from './components/TasbeehCounter';
 import { CalendarView } from './components/CalendarView';
 import { FavoritesBookmarks } from './components/FavoritesBookmarks';
@@ -176,18 +177,20 @@ export default function App() {
 
       {/* Main View Router */}
       {activeDua ? (
-        <DuaReader
-          dua={activeDua}
-          initialPage={activePage}
-          initialRoomId={activeRoomId}
-          autoPlay={autoPlay}
-          settings={settings}
-          onUpdateSettings={handleUpdateSettings}
-          onBack={handleBackFromReader}
-          onShareVerse={(verse, dua) => setShareData({ verse, dua })}
-          isFavorite={favorites.includes(activeDua.id)}
-          onToggleFavorite={() => handleToggleFavorite(activeDua.id)}
-        />
+        <ErrorBoundary fallbackTitle="تنبيه في عرض الدعاء" onReset={handleBackFromReader}>
+          <DuaReader
+            dua={activeDua}
+            initialPage={activePage}
+            initialRoomId={activeRoomId}
+            autoPlay={autoPlay}
+            settings={settings}
+            onUpdateSettings={handleUpdateSettings}
+            onBack={handleBackFromReader}
+            onShareVerse={(verse, dua) => setShareData({ verse, dua })}
+            isFavorite={favorites.includes(activeDua.id)}
+            onToggleFavorite={() => handleToggleFavorite(activeDua.id)}
+          />
+        </ErrorBoundary>
       ) : (
         <div className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-6 pb-24 md:pb-12">
           {currentTab === 'home' && (

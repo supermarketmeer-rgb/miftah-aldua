@@ -93,14 +93,34 @@ class LiveVoiceEngine {
       await this.acquireLocalAudio();
 
       // Initialize Peer with the unique room ID as its Peer ID
-      this.peer = new Peer(finalRoomId, {
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' },
-            { urls: 'stun:stun2.l.google.com:19302' }
-          ]
+      try {
+        this.peer = new Peer(finalRoomId, {
+          config: {
+            iceServers: [
+              { urls: 'stun:stun.l.google.com:19302' },
+              { urls: 'stun:stun1.l.google.com:19302' },
+              { urls: 'stun:stun2.l.google.com:19302' }
+            ]
+          }
+        });
+      } catch (peerErr: any) {
+        this.state.status = 'error';
+        this.state.errorMessage = 'تعذر تشغيل شبكة الاتصال الصوتي: ' + (peerErr?.message || '');
+        this.notify();
+        return finalRoomId;
+      }
+
+      // Attach error handler immediately to prevent unhandled EventEmitter errors
+      this.peer.on('error', (err) => {
+        if (err.type === 'unavailable-id') {
+          const fallbackId = this.generateRoomId();
+          this.leaveRoom();
+          this.startRoom(fallbackId).catch(() => {});
+          return;
         }
+        this.state.status = 'error';
+        this.state.errorMessage = 'تنبيه الاتصال: ' + (err.message || err.type);
+        this.notify();
       });
 
       this.peer.on('open', () => {
@@ -115,7 +135,9 @@ class LiveVoiceEngine {
         this.notify();
 
         // Answer incoming call with local audio stream
-        incomingCall.answer(this.localStream!);
+        if (this.localStream) {
+          incomingCall.answer(this.localStream);
+        }
 
         incomingCall.on('stream', (remoteAudioStream) => {
           this.handleRemoteStream(remoteAudioStream);
@@ -131,19 +153,6 @@ class LiveVoiceEngine {
         });
       });
 
-      this.peer.on('error', (err) => {
-        // If ID is already taken, generate new ID
-        if (err.type === 'unavailable-id') {
-          const fallbackId = this.generateRoomId();
-          this.leaveRoom();
-          this.startRoom(fallbackId);
-          return;
-        }
-        this.state.status = 'error';
-        this.state.errorMessage = 'تعذر إنشاء الغرفة الصوتية: ' + (err.message || err.type);
-        this.notify();
-      });
-
       return finalRoomId;
     } catch (err: any) {
       this.state.status = 'error';
@@ -151,7 +160,7 @@ class LiveVoiceEngine {
         ? 'يرجى السماح للتطبيق باستخدام المايكروفون لبدء القراءة الصوتية.'
         : 'فشل تشغيل المايكروفون: ' + (err.message || 'خطأ غير معروف');
       this.notify();
-      throw err;
+      return finalRoomId;
     }
   }
 
@@ -159,7 +168,12 @@ class LiveVoiceEngine {
    * Joins an existing room as a Participant / Listener
    */
   public async joinRoom(roomId: string): Promise<void> {
-    if (!roomId) throw new Error('رمز الغرفة غير صالح');
+    if (!roomId) {
+      this.state.status = 'error';
+      this.state.errorMessage = 'رمز الغرفة غير صالح';
+      this.notify();
+      return;
+    }
 
     this.state = {
       ...this.state,
@@ -176,22 +190,39 @@ class LiveVoiceEngine {
 
       // Generate a distinct participant peer ID
       const participantId = `part-${this.generateRoomId()}`;
-      this.peer = new Peer(participantId, {
-        config: {
-          iceServers: [
-            { urls: 'stun:stun.l.google.com:19302' },
-            { urls: 'stun:stun1.l.google.com:19302' },
-            { urls: 'stun:stun2.l.google.com:19302' }
-          ]
-        }
+      try {
+        this.peer = new Peer(participantId, {
+          config: {
+            iceServers: [
+              { urls: 'stun:stun.l.google.com:19302' },
+              { urls: 'stun:stun1.l.google.com:19302' },
+              { urls: 'stun:stun2.l.google.com:19302' }
+            ]
+          }
+        });
+      } catch (peerErr: any) {
+        this.state.status = 'error';
+        this.state.errorMessage = 'تعذر تشغيل شبكة الاتصال الصوتي: ' + (peerErr?.message || '');
+        this.notify();
+        return;
+      }
+
+      this.peer.on('error', (err) => {
+        this.state.status = 'error';
+        this.state.errorMessage = err.type === 'peer-unavailable'
+          ? 'الغرفة الصوتية غير متاحة حالياً أو انتهت الجلسة.'
+          : 'تعذر الانضمام للغرفة الصوتية: ' + (err.message || err.type);
+        this.notify();
       });
 
       this.peer.on('open', () => {
         this.state.status = 'connecting';
         this.notify();
 
+        if (!this.localStream) return;
+
         // Call the Host peer
-        const call = this.peer!.call(roomId, this.localStream!);
+        const call = this.peer!.call(roomId, this.localStream);
         this.currentCall = call;
 
         call.on('stream', (remoteAudioStream) => {
@@ -207,21 +238,12 @@ class LiveVoiceEngine {
           this.notify();
         });
       });
-
-      this.peer.on('error', (err) => {
-        this.state.status = 'error';
-        this.state.errorMessage = err.type === 'peer-unavailable'
-          ? 'الغرفة الصوتية غير متاحة حالياً أو انتهت الجلسة.'
-          : 'تعذر الانضمام للغرفة الصوتية: ' + err.message;
-        this.notify();
-      });
     } catch (err: any) {
       this.state.status = 'error';
       this.state.errorMessage = err.name === 'NotAllowedError'
         ? 'يرجى السماح للتطبيق باستخدام المايكروفون للاتصال.'
         : 'فشل تشغيل المايكروفون: ' + (err.message || 'خطأ غير معروف');
       this.notify();
-      throw err;
     }
   }
 
@@ -231,6 +253,10 @@ class LiveVoiceEngine {
   private async acquireLocalAudio(): Promise<MediaStream> {
     if (this.localStream) {
       return this.localStream;
+    }
+
+    if (!navigator?.mediaDevices?.getUserMedia) {
+      throw new Error('المايكروفون غير متاح على هذا الجهاز أو يلزم اتصال آمن');
     }
 
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -243,7 +269,11 @@ class LiveVoiceEngine {
     });
 
     this.localStream = stream;
-    this.setupLocalVolumeAnalyser(stream);
+    try {
+      this.setupLocalVolumeAnalyser(stream);
+    } catch {
+      // Analyser not supported, audio will still work
+    }
     return stream;
   }
 

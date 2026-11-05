@@ -32,6 +32,7 @@ import { audioEngine, AudioRepeatMode } from '../utils/audioEngine';
 import { saveReadingProgress, saveBookmark, getBookmarks, removeBookmark } from '../utils/storage';
 import { TelegramShareModal } from './TelegramShareModal';
 import { LiveVoiceRoomModal } from './LiveVoiceRoomModal';
+import { ErrorBoundary } from './ErrorBoundary';
 
 interface DuaReaderProps {
   dua: Dua;
@@ -829,12 +830,14 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
       />
 
       {/* Live Voice Interactive Recitation Modal / Floating Bar */}
-      <LiveVoiceRoomModal
-        isOpen={showLiveVoiceModal}
-        onClose={() => setShowLiveVoiceModal(false)}
-        dua={dua}
-        initialRoomId={initialRoomId}
-      />
+      <ErrorBoundary fallbackTitle="تنبيه القراءة الصوتية المشتركة">
+        <LiveVoiceRoomModal
+          isOpen={showLiveVoiceModal}
+          onClose={() => setShowLiveVoiceModal(false)}
+          dua={dua}
+          initialRoomId={initialRoomId}
+        />
+      </ErrorBoundary>
     </div>
   );
 };
