@@ -4,14 +4,8 @@ import {
   Clock,
   Bookmark,
   ArrowLeft,
-  Volume2,
-  Play,
   ShieldCheck,
   WifiOff,
-  Sparkles,
-  Moon,
-  Sun,
-  Flame
 } from 'lucide-react';
 import { HijriDateInfo, ReadingProgress, Dua } from '../types';
 import { useOnlineStatus } from '../hooks/useOnlineStatus';
@@ -25,13 +19,9 @@ interface HeroBannerProps {
   onOpenCalendar: () => void;
 }
 
-interface AlertDuaConfig {
+interface OccasionTarget {
+  text: string;
   dua: Dua;
-  badge: string;
-  badgeColor: string;
-  detail: string;
-  iconType: 'moon' | 'sun' | 'sparkles' | 'clock' | 'flame';
-  isNow: boolean;
 }
 
 export const HeroBanner: React.FC<HeroBannerProps> = ({
@@ -45,8 +35,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
   const isOnline = useOnlineStatus();
   const lastReadDua = lastRead ? allDuas.find(d => d.id === lastRead.duaId) : null;
 
-  // Calculate the single Dua whose time has arrived right now
-  const dueDuaConfig = useMemo<AlertDuaConfig>(() => {
+  // Calculate the occasion and its due Dua (e.g. ليلة الجمعة -> دعاء كميل)
+  const occasionTarget = useMemo<OccasionTarget | null>(() => {
     const now = new Date();
     const day = now.getDay(); // 0 = Sun, 1 = Mon, 2 = Tue, 3 = Wed, 4 = Thu, 5 = Fri, 6 = Sat
     const hour = now.getHours();
@@ -56,14 +46,9 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
     if ((day === 4 && hour >= 16) || (day === 5 && hour < 4)) {
       const kumayl = allDuas.find(d => d.id === 'dua-kumayl' || d.id === 'kumayl');
       if (kumayl) {
-        const isThursdayAfternoon = day === 4 && hour < 18;
         return {
+          text: 'مناسبة اليوم: ليلة الجمعة المباركة - وقت قراءة دعاء كميل وزيارة الحسين (ع)',
           dua: kumayl,
-          badge: isThursdayAfternoon ? 'يقترب موعد ليلة الجمعة' : 'حان وقت ليلة الجمعة المباركة',
-          badgeColor: 'amber',
-          detail: 'أفضل أعمال ليلة الجمعة؛ قراءة دعاء كميل وزيارة الحسين (ع) لنيل المغفرة وقضاء الحوائج.',
-          iconType: 'moon',
-          isNow: !isThursdayAfternoon,
         };
       }
     }
@@ -73,12 +58,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       const simat = allDuas.find(d => d.id === 'dua-simat' || d.id === 'samaat');
       if (simat) {
         return {
+          text: 'مناسبة اليوم: آخر ساعة من نهار الجمعة - وقت قراءة دعاء السِمات المستجاب',
           dua: simat,
-          badge: 'ساعة الاستجابة الأخيرة قبل الغروب',
-          badgeColor: 'emerald',
-          detail: 'آخر ساعة من نهار الجمعة من أرجى أوقات استجابة الدعاء؛ يُستحب قراءة دعاء السِمات.',
-          iconType: 'sparkles',
-          isNow: true,
         };
       }
     }
@@ -88,12 +69,8 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       const nudba = allDuas.find(d => d.id === 'dua-nudba' || d.id === 'nudbah');
       if (nudba) {
         return {
+          text: 'مناسبة اليوم: صباح الجمعة المبارك - وقت قراءة دعاء الندبة الشريف',
           dua: nudba,
-          badge: 'صباح الجمعة المبارك',
-          badgeColor: 'emerald',
-          detail: 'ندبة واستغاثة بصاحب العصر والزمان الحجة بن الحسن (عج).',
-          iconType: 'sun',
-          isNow: true,
         };
       }
     }
@@ -103,61 +80,33 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
       const tawassul = allDuas.find(d => d.id === 'dua-tawassul' || d.id === 'tawassul');
       if (tawassul) {
         return {
+          text: 'مناسبة اليوم: ليلة الأربعاء المباركة - وقت قراءة دعاء التوسل (باب الحوائج)',
           dua: tawassul,
-          badge: 'ليلة الأربعاء المباركة (باب الحوائج)',
-          badgeColor: 'amber',
-          detail: 'التوسل بالنبي الأعظم (ص) وأهل بيته الميامين لقضاء الحوائج وتفريج الهموم.',
-          iconType: 'flame',
-          isNow: true,
         };
       }
     }
 
-    // 5. Early Morning (أذكار الصباح - دعاء الصباح / دعاء العهد)
+    // 5. Early Morning (أوراد الصباح)
     if (hour >= 4 && hour < 10) {
       const morningDua = allDuas.find(d => d.id === 'dua-sabah' || d.id === 'sabah') ||
                          allDuas.find(d => d.id === 'dua-ahd' || d.id === 'ahad');
       if (morningDua) {
         return {
+          text: `أوراد الصباح المباركة: وقت قراءة ${morningDua.title} وتجديد العهد`,
           dua: morningDua,
-          badge: 'أذكار الصباح وتجديد العهد',
-          badgeColor: 'emerald',
-          detail: '«يا من دلّ على ذاته بذاته...» افتتح يومك بكلمات أمير المؤمنين (ع).',
-          iconType: 'sun',
-          isNow: true,
         };
       }
     }
 
-    // 6. Pre-dawn / Suhur (أدعية السحر)
-    if (hour >= 1 && hour < 5) {
-      const sahar = allDuas.find(d => d.id === 'dua-sahar' || d.id === 'sehar') ||
-                    allDuas.find(d => d.id === 'dua-mujir');
-      if (sahar) {
-        return {
-          dua: sahar,
-          badge: 'وقت السحر والمناجاة',
-          badgeColor: 'amber',
-          detail: 'خير ساعات الليل للمستغفرين بالأسحار؛ خلوة إيمانية وابتهال للرب الرحيم.',
-          iconType: 'moon',
-          isNow: true,
-        };
-      }
-    }
-
-    // 7. Special Occasions in Hijri
+    // 6. Hijri Calendar Occasion matching
     if (hijriInfo.occasion) {
       const occLower = hijriInfo.occasion.toLowerCase();
       if (occLower.includes('رجب')) {
         const rajab = allDuas.find(d => d.id === 'dua-rajab');
         if (rajab) {
           return {
+            text: `مناسبة اليوم: ${hijriInfo.occasion} - وقت قراءة ${rajab.title}`,
             dua: rajab,
-            badge: `مناسبة: ${hijriInfo.occasion}`,
-            badgeColor: 'amber',
-            detail: 'يُستحب قراءة هذا الدعاء عقيب كل صلاة في شهر رجب الأصب لنيل الرحمة.',
-            iconType: 'sparkles',
-            isNow: true,
           };
         }
       }
@@ -165,27 +114,40 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
         const shaban = allDuas.find(d => d.id === 'munajat-shabaniyah');
         if (shaban) {
           return {
+            text: `مناسبة اليوم: ${hijriInfo.occasion} - وقت قراءة ${shaban.title}`,
             dua: shaban,
-            badge: `مناسبة: ${hijriInfo.occasion}`,
-            badgeColor: 'amber',
-            detail: 'مناجاة أمير المؤمنين والأئمة الأطهار (ع) المأثورة في شهر شعبان المعظم.',
-            iconType: 'sparkles',
-            isNow: true,
           };
         }
       }
+      if (occLower.includes('رمضان')) {
+        const iftitah = allDuas.find(d => d.id === 'dua-iftitah');
+        if (iftitah) {
+          return {
+            text: `مناسبة اليوم: ${hijriInfo.occasion} - وقت قراءة ${iftitah.title}`,
+            dua: iftitah,
+          };
+        }
+      }
+      if (occLower.includes('عاشوراء') || occLower.includes('محرم')) {
+        const ashura = allDuas.find(d => d.id === 'ziyarat-ashura');
+        if (ashura) {
+          return {
+            text: `مناسبة اليوم: ${hijriInfo.occasion} - وقت قراءة ${ashura.title}`,
+            dua: ashura,
+          };
+        }
+      }
+
+      // Generic occasion if available with today's dua
+      if (todayDua) {
+        return {
+          text: `مناسبة اليوم: ${hijriInfo.occasion}`,
+          dua: todayDua,
+        };
+      }
     }
 
-    // 8. Default: Today's Daily Recommended Dua
-    const fallbackDua = todayDua || allDuas[0];
-    return {
-      dua: fallbackDua,
-      badge: 'دعاء هذا اليوم المستحب',
-      badgeColor: 'emerald',
-      detail: `${fallbackDua.estimatedMinutes || 3} دقائق للقراءة والاستماع ونيل البركة.`,
-      iconType: 'clock',
-      isNow: true,
-    };
+    return null;
   }, [allDuas, todayDua, hijriInfo]);
 
   return (
@@ -245,65 +207,80 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
           <p className="font-amiri text-base sm:text-lg text-emerald-100/90 leading-relaxed">
             «الدُّعَاءُ سِلاحُ الْمُؤْمِنِ، وَعِمَادُ الدِّينِ، وَنُورُ السَّمَاوَاتِ وَالأَرْضِ» — رسول الله (صلى الله عليه وآله)
           </p>
+
+          {/* 
+            نافذة مناسبة اليوم في مكانها الأصلي:
+            "مناسبة اليوم: ليلة الجمعة المباركة - وقت قراءة دعاء كميل وزيارة الحسين (ع)"
+            قابلة للضغط مباشرة لفتح الدعاء المستحق، دون الحاجة لأي نوافذ إضافية!
+          */}
+          {occasionTarget && (
+            <div className="mt-4">
+              <button
+                onClick={() => onSelectDua(occasionTarget.dua)}
+                className="w-full sm:w-auto inline-flex items-center justify-between sm:justify-start gap-3 text-xs sm:text-sm text-amber-200 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/35 hover:border-amber-300 px-4 py-2.5 rounded-xl backdrop-blur-sm transition-all group text-right shadow-sm active:scale-[0.99]"
+                title="اضغط هنا لفتح الدعاء المستحق وقراءته مباشرة"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="relative flex h-2.5 w-2.5 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-400" />
+                  </span>
+                  <span className="font-semibold">{occasionTarget.text}</span>
+                </div>
+                <div className="flex items-center gap-1 text-amber-300 font-bold mr-2 shrink-0">
+                  <span>فتح الدعاء</span>
+                  <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-1 transition-transform" />
+                </div>
+              </button>
+            </div>
+          )}
         </div>
 
-        {/* 
-          Single Unified Alert Button:
-          زر واحد فيه التنبيه عن الدعاء الذي حان وقته للقراءة أو الاستماع
-          وعند الضغط عليه تفتح شاشة الدعاء مباشرة
-        */}
-        <div className="space-y-3 max-w-3xl">
-          <button
-            onClick={() => onSelectDua(dueDuaConfig.dua)}
-            className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/25 via-emerald-600/30 to-amber-500/15 hover:from-amber-500/35 hover:via-emerald-600/40 hover:to-amber-500/25 border-2 border-amber-400/60 hover:border-amber-300 shadow-xl shadow-black/30 backdrop-blur-md transition-all text-right group active:scale-[0.99] gap-3.5"
-          >
-            <div className="flex items-center gap-3.5">
-              {/* Glowing Pulse Icon */}
-              <div className="relative w-12 h-12 rounded-2xl bg-amber-500/25 text-amber-300 border border-amber-400/40 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform shadow-md shadow-amber-950/40">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-2xl bg-amber-400 opacity-25" />
-                <Volume2 className="w-6 h-6 text-amber-300" />
-              </div>
-
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
-                  </span>
-                  <span className="text-xs font-bold text-amber-300 tracking-wide">
-                    {dueDuaConfig.badge}
-                  </span>
+        {/* Interactive Action Hub: Today's Dua & Last Read Resumption */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-3xl">
+          {todayDua && (
+            <button
+              onClick={() => onSelectDua(todayDua)}
+              className="flex items-center justify-between p-4 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/10 backdrop-blur-md transition-all text-right group hover:border-amber-400/40"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-amber-500/20 text-amber-300 border border-amber-400/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <Clock className="w-5 h-5" />
                 </div>
-                <div className="font-amiri text-xl sm:text-2xl font-bold text-white group-hover:text-amber-200 transition-colors">
-                  {dueDuaConfig.dua.title}
-                </div>
-                <div className="text-xs text-emerald-100/80 line-clamp-1 mt-0.5">
-                  {dueDuaConfig.detail}
+                <div>
+                  <div className="text-xs text-amber-200/80 mb-0.5">دعاء هذا اليوم المستحب</div>
+                  <div className="font-amiri text-lg font-bold text-white group-hover:text-amber-300 transition-colors">
+                    {todayDua.title}
+                  </div>
+                  <div className="text-[11px] text-emerald-200/70">
+                    {todayDua.estimatedMinutes} دقائق للقراءة والاستماع
+                  </div>
                 </div>
               </div>
-            </div>
+              <ArrowLeft className="w-5 h-5 text-amber-300/70 group-hover:text-amber-300 group-hover:-translate-x-1 transition-all shrink-0" />
+            </button>
+          )}
 
-            {/* Action Pill Inside Button */}
-            <div className="flex items-center gap-1.5 self-end sm:self-center px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 group-hover:from-amber-400 group-hover:to-amber-500 text-stone-950 font-bold text-xs sm:text-sm shrink-0 shadow-md group-hover:shadow-amber-500/30 transition-all">
-              <Play className="w-3.5 h-3.5 fill-stone-950" />
-              <span>تشغيل واستماع</span>
-              <ArrowLeft className="w-4 h-4 mr-0.5 group-hover:-translate-x-1 transition-transform" />
-            </div>
-          </button>
-
-          {/* Last read resumption strip (if available) */}
           {lastReadDua && (
             <button
               onClick={() => onSelectDua(lastReadDua, lastRead?.pageNumber || 1)}
-              className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-right text-xs text-stone-300 hover:text-white transition group"
+              className="flex items-center justify-between p-4 rounded-2xl bg-emerald-800/40 hover:bg-emerald-800/60 border border-emerald-500/30 backdrop-blur-md transition-all text-right group hover:border-emerald-400/60"
             >
-              <div className="flex items-center gap-2 truncate">
-                <Bookmark className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span className="text-emerald-300 font-medium">متابعة آخر موضع:</span>
-                <span className="truncate text-white font-semibold">{lastReadDua.title}</span>
-                <span className="text-stone-400 text-[11px]">(الصفحة {lastRead?.pageNumber || 1})</span>
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                  <Bookmark className="w-5 h-5" />
+                </div>
+                <div>
+                  <div className="text-xs text-emerald-300/80 mb-0.5">متابعة آخر موضع قراءة</div>
+                  <div className="font-amiri text-lg font-bold text-white group-hover:text-emerald-200 transition-colors">
+                    {lastReadDua.title}
+                  </div>
+                  <div className="text-[11px] text-emerald-200/70">
+                    الصفحة {lastRead?.pageNumber || 1} · {lastRead?.percent || 0}% منجز
+                  </div>
+                </div>
               </div>
-              <ArrowLeft className="w-3.5 h-3.5 text-stone-400 group-hover:text-emerald-300 group-hover:-translate-x-1 transition-all shrink-0" />
+              <ArrowLeft className="w-5 h-5 text-emerald-300/70 group-hover:text-emerald-300 group-hover:-translate-x-1 transition-all shrink-0" />
             </button>
           )}
         </div>
