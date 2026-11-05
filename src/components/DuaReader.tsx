@@ -339,28 +339,29 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {/* Live Voice Recitation Button */}
             <button
               onClick={() => {
                 setShowLiveVoiceModal(true);
                 setExpandVoiceModalTrigger((t) => t + 1);
               }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-800 dark:text-amber-300 border border-amber-500/30 text-xs font-semibold transition active:scale-[0.98]"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white border border-amber-500 shadow-xs text-xs font-bold transition active:scale-[0.98]"
               title="بدء قراءة صوتية مباشرة مع شخص آخر (مكالمة)"
             >
-              <Radio className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+              <Radio className="w-3.5 h-3.5 text-amber-200 animate-pulse shrink-0" />
               <span className="hidden sm:inline">قراءة صوتية مباشرة</span>
-              <span className="sm:hidden">مباشر 🎙️</span>
+              <span className="sm:hidden font-bold">مباشر 🎙️</span>
             </button>
 
             <button
               onClick={() => setShowTelegramShareModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600/15 hover:bg-emerald-600/25 text-emerald-800 dark:text-emerald-300 text-xs font-semibold transition"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 active:bg-emerald-950 text-white border border-emerald-700 shadow-xs text-xs font-bold transition active:scale-[0.98]"
               title="مشاركة الدعاء والرابط المباشر"
             >
-              <Share2 className="w-3.5 h-3.5" />
+              <Share2 className="w-3.5 h-3.5 text-emerald-200 shrink-0" />
               <span className="hidden sm:inline">مشاركة الدعاء</span>
+              <span className="sm:hidden font-bold">مشاركة 🔗</span>
             </button>
 
             <button
@@ -507,7 +508,7 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
 
       {/* Main Electronic Book Page Container */}
       <main
-        className="max-w-4xl mx-auto px-4 sm:px-6 pt-4"
+        className="max-w-4xl mx-auto px-4 sm:px-6 pt-4 pb-44"
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
@@ -654,11 +655,14 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
       </main>
 
       {/* Floating Synced Audio Player Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#fcfbf7]/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-emerald-900/10 dark:border-emerald-800/30 shadow-2xl pb-safe">
-        <div className="max-w-4xl mx-auto px-4 py-3">
+      <div
+        className="fixed bottom-0 left-0 right-0 z-40 bg-[#fcfbf7]/98 dark:bg-slate-900/98 backdrop-blur-md border-t border-emerald-900/15 dark:border-emerald-800/30 shadow-2xl"
+        style={{ paddingBottom: 'max(14px, env(safe-area-inset-bottom, 14px))' }}
+      >
+        <div className="max-w-4xl mx-auto px-3 sm:px-4 pt-2.5 pb-2">
           {/* Audio Scrubber Bar */}
-          <div className="flex items-center gap-3 text-[11px] font-mono text-stone-500 dark:text-stone-400 mb-2">
-            <span>{formatTime(currentTime)}</span>
+          <div className="flex items-center gap-2 text-[11px] font-mono text-stone-600 dark:text-stone-300 mb-2">
+            <span className="w-10 text-right shrink-0">{formatTime(currentTime)}</span>
             <input
               type="range"
               min="0"
@@ -668,21 +672,21 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
               onChange={handleScrubAudio}
               className="w-full accent-emerald-700 cursor-pointer h-1.5 bg-stone-200 dark:bg-slate-700 rounded-lg"
             />
-            <span>{formatTime(duration)}</span>
+            <span className="w-10 text-left shrink-0">{formatTime(duration)}</span>
           </div>
 
           {/* Audio Controls Row */}
-          <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center justify-between gap-1 sm:gap-2">
             {/* Left: Reciter Selector & Offline Status */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-1.5 min-w-0 shrink">
               <select
                 value={selectedReciterId}
                 onChange={(e) => setSelectedReciterId(e.target.value)}
-                className="text-xs bg-white dark:bg-slate-800 border border-stone-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-stone-800 dark:text-stone-200 focus:outline-none focus:border-emerald-700"
+                className="text-[11px] sm:text-xs font-semibold bg-white dark:bg-slate-800 border border-stone-300 dark:border-slate-700 rounded-lg px-2 py-1.5 text-stone-800 dark:text-stone-200 focus:outline-none focus:border-emerald-700 max-w-[125px] sm:max-w-[170px] truncate shadow-2xs"
               >
                 {RECITERS.map(r => (
                   <option key={r.id} value={r.id}>
-                    بصوت: {r.nameAr}
+                    {r.nameAr}
                   </option>
                 ))}
               </select>
@@ -690,7 +694,7 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
               <button
                 onClick={handleDownloadAudio}
                 disabled={isAudioOffline || downloadingAudio}
-                className={`p-1.5 rounded-lg text-xs transition flex items-center gap-1 ${
+                className={`p-1.5 rounded-lg text-xs transition flex items-center gap-1 shrink-0 ${
                   isAudioOffline
                     ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-500/10'
                     : 'text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-slate-800'
@@ -702,17 +706,17 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
                 ) : (
                   <Download className="w-3.5 h-3.5" />
                 )}
-                <span className="hidden sm:inline text-[11px]">
+                <span className="hidden md:inline text-[11px]">
                   {isAudioOffline ? 'محفوظ أوفلاين' : 'تحميل'}
                 </span>
               </button>
             </div>
 
-            {/* Center: Playback Buttons */}
-            <div className="flex items-center gap-2">
+            {/* Center: Playback Buttons - Centered and fully visible on all mobile screens */}
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
               <button
                 onClick={() => audioEngine.prevVerse()}
-                className="p-2 rounded-xl text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-slate-800 transition"
+                className="p-1.5 sm:p-2 rounded-xl text-stone-700 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-slate-800 transition active:scale-95"
                 title="الفقرة السابقة"
               >
                 <ChevronRight className="w-5 h-5" />
@@ -720,7 +724,7 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
 
               <button
                 onClick={togglePlayAudio}
-                className="w-11 h-11 rounded-2xl bg-emerald-800 hover:bg-emerald-900 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white flex items-center justify-center shadow-md active:scale-95 transition-all"
+                className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-emerald-700 hover:bg-emerald-800 active:bg-emerald-900 text-white flex items-center justify-center shadow-lg active:scale-95 transition-all shrink-0"
                 title={isPlaying ? 'إيقاف مؤقت' : 'استماع للدعاء'}
               >
                 {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 mr-0.5" />}
@@ -728,7 +732,7 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
 
               <button
                 onClick={() => audioEngine.nextVerse()}
-                className="p-2 rounded-xl text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-slate-800 transition"
+                className="p-1.5 sm:p-2 rounded-xl text-stone-700 dark:text-stone-200 hover:bg-stone-200 dark:hover:bg-slate-800 transition active:scale-95"
                 title="الفقرة التالية"
               >
                 <ChevronLeft className="w-5 h-5" />
@@ -736,10 +740,10 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
             </div>
 
             {/* Right: Audio Speed & Repeat Mode */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1 shrink-0">
               <button
                 onClick={handleCycleSpeed}
-                className="px-2 py-1 rounded-lg text-xs font-mono font-medium border border-stone-200 dark:border-slate-700 hover:bg-stone-100 dark:hover:bg-slate-800 transition"
+                className="px-2 py-1 rounded-lg text-[11px] sm:text-xs font-mono font-bold border border-stone-300 dark:border-slate-700 hover:bg-stone-100 dark:hover:bg-slate-800 transition text-stone-800 dark:text-stone-200"
                 title="سرعة التشغيل"
               >
                 {playbackRate}x

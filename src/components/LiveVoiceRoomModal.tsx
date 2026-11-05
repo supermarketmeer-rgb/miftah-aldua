@@ -358,32 +358,32 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
         </div>
 
         {/* Share Invitation Section */}
-        <div className="p-4 rounded-2xl bg-stone-50 dark:bg-slate-800/60 border border-stone-200/70 dark:border-slate-700/70 space-y-3 mb-5">
+        <div className="p-4 rounded-2xl bg-amber-500/10 dark:bg-slate-800/90 border-2 border-emerald-600/30 dark:border-emerald-500/40 space-y-3 mb-5 shadow-xs">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-stone-800 dark:text-stone-200 flex items-center gap-1.5">
-              <Share2 className="w-3.5 h-3.5 text-emerald-600" />
+            <span className="text-xs font-bold text-emerald-950 dark:text-emerald-200 flex items-center gap-1.5">
+              <Share2 className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
               <span>رابط دعوة الطرف الآخر للقراءة الصوتية:</span>
             </span>
-            <span className="text-[10px] text-stone-500 font-mono">
+            <span className="text-[11px] font-bold text-emerald-900 dark:text-emerald-300 bg-white dark:bg-slate-900 px-2 py-0.5 rounded-md border border-emerald-300 dark:border-slate-700">
               غرفة: {voiceState.roomId || initialRoomId}
             </span>
           </div>
 
           {/* Link box with copy */}
-          <div className="flex items-center gap-2 p-2 rounded-xl border border-stone-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+          <div className="flex items-center gap-2 p-2 rounded-xl border border-emerald-600/30 dark:border-emerald-500/30 bg-white dark:bg-slate-900">
             <input
               type="text"
               readOnly
               value={shareLink}
-              className="flex-1 text-[11px] font-mono text-stone-700 dark:text-stone-300 truncate focus:outline-none text-left bg-transparent"
+              className="flex-1 text-xs font-mono font-bold text-stone-900 dark:text-white truncate focus:outline-none text-left bg-transparent"
               dir="ltr"
             />
             <button
               onClick={handleCopyLink}
-              className="p-1.5 px-2.5 rounded-lg bg-stone-100 dark:bg-slate-800 hover:bg-stone-200 text-stone-800 dark:text-stone-200 text-xs font-semibold shrink-0 flex items-center gap-1 transition"
+              className="p-1.5 px-3 rounded-lg bg-emerald-800 hover:bg-emerald-900 text-white text-xs font-bold shrink-0 flex items-center gap-1 transition shadow-xs"
             >
-              {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-              <span>{copiedLink ? 'تم النسخ' : 'نسخ'}</span>
+              {copiedLink ? <Check className="w-3.5 h-3.5 text-amber-300" /> : <Copy className="w-3.5 h-3.5" />}
+              <span>{copiedLink ? 'تم النسخ' : 'نسخ الرابط'}</span>
             </button>
           </div>
 
