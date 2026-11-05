@@ -24,6 +24,7 @@ import {
 } from '../utils/liveVoiceEngine';
 import {
   formatLiveVoiceInvitation,
+  generateLiveVoiceShareLink,
   generateWhatsAppShareUrl,
   generateTelegramShareUrl
 } from '../utils/deepLink';
