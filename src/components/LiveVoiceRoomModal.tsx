@@ -59,7 +59,7 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
     remoteConnected: false,
   });
 
-  const [isMinimized, setIsMinimized] = useState<boolean>(false);
+  const [isMinimized, setIsMinimized] = useState<boolean>(Boolean(initialRoomId || isJoiningDirectly));
   const [copiedLink, setCopiedLink] = useState<boolean>(false);
   const [shortRoomLink, setShortRoomLink] = useState<string>('');
 
@@ -73,7 +73,12 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
   // When user clicks the top bar mic button or opens modal, expand it and initialize if needed
   useEffect(() => {
     if (isOpen) {
-      setIsMinimized(false);
+      if (expandTrigger > 0) {
+        setIsMinimized(false);
+      } else if (initialRoomId || isJoiningDirectly) {
+        setIsMinimized(true);
+      }
+
       if (voiceState.status === 'idle' || voiceState.status === 'error') {
         if (initialRoomId) {
           liveVoiceEngine.joinRoom(initialRoomId).catch(() => {});
@@ -134,6 +139,7 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
 
   const handleOpenWhatsApp = (e: React.MouseEvent) => {
     e.preventDefault();
+    setIsMinimized(true);
     if (typeof window !== 'undefined') {
       window.open(whatsappUrl, '_system') || (window.location.href = whatsappUrl);
     }
@@ -141,6 +147,7 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
 
   const handleOpenTelegram = (e: React.MouseEvent) => {
     e.preventDefault();
+    setIsMinimized(true);
     if (typeof window !== 'undefined') {
       window.open(telegramUrl, '_system') || (window.location.href = telegramUrl);
     }
@@ -160,7 +167,7 @@ export const LiveVoiceRoomModal: React.FC<LiveVoiceRoomModalProps> = ({
   // -------------------------------------------------------------
   if (isMinimized) {
     return (
-      <div className="fixed bottom-24 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-[60] animate-in fade-in slide-in-from-bottom-4">
+      <div className="fixed bottom-5 left-4 right-4 sm:left-auto sm:right-6 sm:w-96 z-[60] animate-in fade-in slide-in-from-bottom-4">
         <div className="rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-stone-900 text-white p-3.5 shadow-2xl border-2 border-emerald-500/40 backdrop-blur-xl flex items-center justify-between gap-3">
           <div className="flex items-center gap-2.5 overflow-hidden">
             {/* Live Pulsing Dot */}
