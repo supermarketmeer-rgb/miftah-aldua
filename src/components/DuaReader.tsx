@@ -315,23 +315,23 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
   };
 
   return (
-    <div className={`min-h-screen pb-32 transition-colors duration-200 ${getThemeContainerClass()}`}>
+    <div className={`min-h-screen w-full max-w-full overflow-x-hidden pb-16 transition-colors duration-200 ${getThemeContainerClass()} flex flex-col items-center`}>
       {/* Top Header Bar for Reader */}
-      <div className="sticky top-0 z-30 border-b border-stone-200/40 dark:border-slate-800 bg-inherit/95 backdrop-blur-md px-4 py-3">
-        <div className="max-w-4xl mx-auto flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
+      <div className="sticky top-0 z-30 w-full border-b border-stone-200/40 dark:border-slate-800 bg-inherit/95 backdrop-blur-md px-3 sm:px-4 py-2.5">
+        <div className="max-w-3xl mx-auto flex items-center justify-between gap-2 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <button
               onClick={onBack}
-              className="p-2 -mr-2 rounded-xl text-stone-600 dark:text-stone-300 hover:text-emerald-700 dark:hover:text-amber-400 hover:bg-stone-200/50 dark:hover:bg-slate-800 transition"
+              className="p-2 -mr-1 rounded-xl text-stone-600 dark:text-stone-300 hover:text-emerald-700 dark:hover:text-amber-400 hover:bg-stone-200/50 dark:hover:bg-slate-800 transition shrink-0"
               title="العودة لقائمة الأدعية"
             >
               <ArrowRight className="w-5 h-5" />
             </button>
-            <div>
-              <h2 className="font-amiri text-lg sm:text-xl font-bold tracking-tight line-clamp-1">
+            <div className="min-w-0">
+              <h2 className="font-amiri text-lg sm:text-xl font-bold tracking-tight truncate">
                 {dua.title}
               </h2>
-              <div className="flex items-center gap-2 text-xs text-stone-500 dark:text-stone-400">
+              <div className="flex items-center gap-2 text-xs text-stone-500 dark:text-stone-400 truncate">
                 <span>{dua.occasion}</span>
                 <span aria-hidden="true">·</span>
                 <span>الصفحة {currentPage} من {totalPages}</span>
@@ -339,7 +339,7 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
             </div>
           </div>
 
-          <div className="flex items-center gap-1 sm:gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
             {/* Live Voice Recitation Button */}
             <button
               onClick={() => {
@@ -354,13 +354,36 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
               <span className="sm:hidden">مباشر 🎙️</span>
             </button>
 
+            {/* Small Audio Playback Button - replaces the hidden Share button */}
+            <button
+              onClick={togglePlayAudio}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition active:scale-95 shadow-xs border ${
+                isPlaying
+                  ? 'bg-emerald-700 hover:bg-emerald-800 text-white border-emerald-600'
+                  : 'bg-emerald-600/15 hover:bg-emerald-600/25 text-emerald-800 dark:text-emerald-300 border-emerald-600/30'
+              }`}
+              title={isPlaying ? 'إيقاف التلاوة الصوتية مؤقتاً' : 'استماع لتلاوة الدعاء'}
+            >
+              {isPlaying ? (
+                <>
+                  <Pause className="w-3.5 h-3.5 fill-current" />
+                  <span>إيقاف ⏸️</span>
+                </>
+              ) : (
+                <>
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>تشغيل ▶️</span>
+                </>
+              )}
+            </button>
+
+            {/* Hidden Share Button (code preserved, hidden from screen as requested) */}
             <button
               onClick={() => setShowTelegramShareModal(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-600/15 hover:bg-emerald-600/25 text-emerald-800 dark:text-emerald-300 text-xs font-semibold transition"
+              className="hidden"
               title="مشاركة الدعاء والرابط المباشر"
             >
               <Share2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">مشاركة الدعاء</span>
             </button>
 
             <button
@@ -507,12 +530,13 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
 
       {/* Main Electronic Book Page Container */}
       <main
-        className="max-w-4xl mx-auto px-4 sm:px-6 pt-4"
+        className="w-full max-w-3xl mx-auto px-3 sm:px-6 pt-4 pb-12 overflow-x-hidden flex flex-col items-center"
+        style={{ touchAction: 'pan-y' }}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
         <div
-          className={`relative rounded-3xl p-6 sm:p-10 lg:p-12 transition-all ${getThemeCardClass()} islamic-frame`}
+          className={`w-full relative rounded-3xl p-5 sm:p-8 lg:p-10 transition-all ${getThemeCardClass()} islamic-frame overflow-x-hidden shadow-xs`}
         >
           {/* Subtle Decorative Islamic Header Motif */}
           <div className="flex items-center justify-center gap-3 mb-8 opacity-75">
@@ -607,12 +631,13 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
                         )}
                       </button>
 
+                      {/* Share button hidden from screens as requested */}
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           onShareVerse(verse, dua);
                         }}
-                        className="p-1.5 rounded-lg hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-stone-200/50 dark:hover:bg-slate-800 transition"
+                        className="hidden p-1.5 rounded-lg hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-stone-200/50 dark:hover:bg-slate-800 transition"
                         title="مشاركة كبطاقة مصممة"
                       >
                         <Share2 className="w-3.5 h-3.5" />
@@ -652,124 +677,6 @@ export const DuaReader: React.FC<DuaReaderProps> = ({
           )}
         </div>
       </main>
-
-      {/* Floating Synced Audio Player Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#fcfbf7]/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-emerald-900/10 dark:border-emerald-800/30 shadow-2xl pb-safe">
-        <div className="max-w-4xl mx-auto px-4 py-3">
-          {/* Audio Scrubber Bar */}
-          <div className="flex items-center gap-3 text-[11px] font-mono text-stone-500 dark:text-stone-400 mb-2">
-            <span>{formatTime(currentTime)}</span>
-            <input
-              type="range"
-              min="0"
-              max={duration || 100}
-              step="0.5"
-              value={currentTime}
-              onChange={handleScrubAudio}
-              className="w-full accent-emerald-700 cursor-pointer h-1.5 bg-stone-200 dark:bg-slate-700 rounded-lg"
-            />
-            <span>{formatTime(duration)}</span>
-          </div>
-
-          {/* Audio Controls Row */}
-          <div className="flex items-center justify-between gap-2">
-            {/* Left: Reciter Selector & Offline Status */}
-            <div className="flex items-center gap-2">
-              <select
-                value={selectedReciterId}
-                onChange={(e) => setSelectedReciterId(e.target.value)}
-                className="text-xs bg-white dark:bg-slate-800 border border-stone-200 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-stone-800 dark:text-stone-200 focus:outline-none focus:border-emerald-700"
-              >
-                {RECITERS.map(r => (
-                  <option key={r.id} value={r.id}>
-                    بصوت: {r.nameAr}
-                  </option>
-                ))}
-              </select>
-
-              <button
-                onClick={handleDownloadAudio}
-                disabled={isAudioOffline || downloadingAudio}
-                className={`p-1.5 rounded-lg text-xs transition flex items-center gap-1 ${
-                  isAudioOffline
-                    ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-500/10'
-                    : 'text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-slate-800'
-                }`}
-                title={isAudioOffline ? 'تم التنزيل للاستماع دون اتصال' : 'تحميل للاستماع بدون اتصال'}
-              >
-                {downloadingAudio ? (
-                  <span className="w-3.5 h-3.5 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin" />
-                ) : (
-                  <Download className="w-3.5 h-3.5" />
-                )}
-                <span className="hidden sm:inline text-[11px]">
-                  {isAudioOffline ? 'محفوظ أوفلاين' : 'تحميل'}
-                </span>
-              </button>
-            </div>
-
-            {/* Center: Playback Buttons */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => audioEngine.prevVerse()}
-                className="p-2 rounded-xl text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-slate-800 transition"
-                title="الفقرة السابقة"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
-
-              <button
-                onClick={togglePlayAudio}
-                className="w-11 h-11 rounded-2xl bg-emerald-800 hover:bg-emerald-900 dark:bg-emerald-700 dark:hover:bg-emerald-600 text-white flex items-center justify-center shadow-md active:scale-95 transition-all"
-                title={isPlaying ? 'إيقاف مؤقت' : 'استماع للدعاء'}
-              >
-                {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 mr-0.5" />}
-              </button>
-
-              <button
-                onClick={() => audioEngine.nextVerse()}
-                className="p-2 rounded-xl text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-slate-800 transition"
-                title="الفقرة التالية"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-            </div>
-
-            {/* Right: Audio Speed & Repeat Mode */}
-            <div className="flex items-center gap-1.5">
-              <button
-                onClick={handleCycleSpeed}
-                className="px-2 py-1 rounded-lg text-xs font-mono font-medium border border-stone-200 dark:border-slate-700 hover:bg-stone-100 dark:hover:bg-slate-800 transition"
-                title="سرعة التشغيل"
-              >
-                {playbackRate}x
-              </button>
-
-              <button
-                onClick={handleToggleRepeat}
-                className={`p-1.5 rounded-lg transition ${
-                  repeatMode !== 'none'
-                    ? 'text-amber-600 dark:text-amber-400 bg-amber-500/15'
-                    : 'text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-slate-800'
-                }`}
-                title={
-                  repeatMode === 'verse'
-                    ? 'تكرار الفقرة الحالية'
-                    : repeatMode === 'all'
-                    ? 'تكرار الدعاء كاملاً'
-                    : 'بدون تكرار'
-                }
-              >
-                {repeatMode === 'verse' ? (
-                  <Repeat1 className="w-4 h-4" />
-                ) : (
-                  <Repeat className="w-4 h-4" />
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Info & Virtues Modal */}
       {showInfoModal && (

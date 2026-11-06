@@ -73,13 +73,14 @@ export const DuaList: React.FC<DuaListProps> = ({
                   </div>
 
                   <div className="flex items-center gap-1">
+                    {/* Share icon hidden from screens per user request */}
                     {onOpenTelegramShare && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onOpenTelegramShare(dua);
+                          onOpenTelegramShare?.(dua);
                         }}
-                        className="p-1.5 rounded-lg text-stone-400 hover:text-emerald-700 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 transition"
+                        className="hidden"
                         title="مشاركة الدعاء والرابط"
                       >
                         <Share2 className="w-3.5 h-3.5" />
